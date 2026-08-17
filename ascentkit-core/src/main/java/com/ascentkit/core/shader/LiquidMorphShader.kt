@@ -1,7 +1,7 @@
-package com.liquidglass.core.shader
+package com.ascentkit.core.shader
 
 /**
- * Source AGSL untuk efek "liquid glass": membelokkan sample warna di sekitar
+ * Source AGSL untuk efek "liquid morph": membelokkan sample warna di sekitar
  * tepi surface, mensimulasikan refraksi kaca cair.
  *
  * Hanya kompatibel dengan RuntimeShader (API 33+).
@@ -11,7 +11,7 @@ package com.liquidglass.core.shader
  *   - uTouch     (float2)  -> posisi sentuhan terakhir (px), untuk ripple
  *   - uIntensity (float)   -> kekuatan distorsi, 0.0 - 1.0
  */
-object LiquidGlassShader {
+object LiquidMorphShader {
 
     const val SOURCE = """
         uniform shader composable;

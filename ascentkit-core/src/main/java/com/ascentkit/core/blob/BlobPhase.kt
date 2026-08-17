@@ -1,4 +1,4 @@
-package com.liquidglass.core.blob
+package com.ascentkit.core.blob
 
 import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
 import androidx.compose.runtime.Composable
@@ -8,7 +8,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalInspectionMode
-import com.liquidglass.core.rememberBatterySaverActive
+import com.ascentkit.core.rememberBatterySaverActive
 
 /**
  * Menghasilkan nilai phase yang berjalan terus (dalam radian per detik `speed`),

@@ -1,4 +1,4 @@
-package com.liquidglass.core
+package com.ascentkit.core
 
 import android.content.Context
 import android.os.PowerManager
@@ -13,7 +13,7 @@ import androidx.compose.ui.platform.LocalContext
 /**
  * Mengembalikan true jika device sedang dalam mode hemat baterai (Battery Saver / Power Save Mode).
  *
- * Dipakai secara internal untuk otomatis meredam animasi liquid glass yang berat
+ * Dipakai secara internal untuk otomatis meredam animasi liquid morph yang berat
  * (shader wave, blob wobble) ketika pengguna sudah minta perangkat berhemat daya —
  * menghormati preferensi pengguna alih-alih terus memaksakan efek visual mahal.
  *

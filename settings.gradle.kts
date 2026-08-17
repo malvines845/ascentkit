@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LiquidGlass"
+rootProject.name = "AscentKit"
 include(":app")
-include(":liquidglass-core")
+include(":ascentkit-core")

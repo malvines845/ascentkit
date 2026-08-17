@@ -1,4 +1,4 @@
-package com.liquidglass.core
+package com.ascentkit.core
 
 import android.os.Build
 import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
@@ -23,7 +23,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalInspectionMode
 
 /**
- * Modifier liquid glass, tier-aware:
+ * Modifier liquid morph, tier-aware:
  * - FULL      (API 33+) -> blur + distorsi shader AGSL, animasi berjalan, respons sentuh
  * - BLUR_ONLY (API 31-32) -> blur real-time polos, tanpa distorsi
  * - STATIC    (< API 31) -> fallback tint datar
@@ -38,7 +38,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
  *                     mode hemat baterai, terlepas dari nilai [animate]. Set false untuk selalu
  *                     memaksa animasi berjalan (jarang diperlukan; pertimbangkan dampak baterai).
  */
-fun Modifier.liquidGlass(
+fun Modifier.liquidMorph(
     blurRadius: Float = 24f,
     tint: Color = Color.White.copy(alpha = 0.18f),
     cornerRadius: Float = 24f,
@@ -59,7 +59,7 @@ fun Modifier.liquidGlass(
                 // Cache satu instance factory per surface (bukan per frame). Instance ini
                 // menyimpan RuntimeShader yang sudah dikompilasi, jadi frame berikutnya hanya
                 // meng-update uniform, bukan mengompilasi ulang shader dari nol.
-                val effectFactory = remember { LiquidGlassEffectFactory() }
+                val effectFactory = remember { LiquidMorphEffectFactory() }
 
                 val batterySaverActive = if (respectBatterySaver) {
                     rememberBatterySaverActive()

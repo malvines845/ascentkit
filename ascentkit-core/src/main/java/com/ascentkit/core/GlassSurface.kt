@@ -1,4 +1,4 @@
-package com.liquidglass.core
+package com.ascentkit.core
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,7 +31,7 @@ fun GlassSurface(
     content: @Composable Box.() -> Unit = {},
 ) {
     Box(
-        modifier = modifier.liquidGlass(
+        modifier = modifier.liquidMorph(
             blurRadius = blurRadius,
             tint = tint,
             cornerRadius = cornerRadius,

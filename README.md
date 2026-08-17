@@ -1,6 +1,6 @@
-# Liquid Glass — Fase 3
+# AscentKit — Fase 3
 
-Framework Android (Jetpack Compose) untuk efek "liquid glass".
+Framework Android (Jetpack Compose) untuk efek visual "liquid morph".
 Fase 1: blur real-time + tint. Fase 2: distorsi refraction via shader AGSL + respons sentuh.
 Fase 3: morphing shape (blob) — tepi kaca yang "bernapas" secara organik.
 
@@ -15,18 +15,20 @@ Fase 3: morphing shape (blob) — tepi kaca yang "bernapas" secara organik.
 
 **Versi target:** `compileSdk`/`targetSdk` = 36 (Android 16), sesuai requirement Google Play
 per 31 Agustus 2026. `minSdk` tetap 26 — device lama tetap didukung lewat fallback tier,
-cuma nggak dapat efek liquid-nya.
+cuma nggak dapat efek liquid morph-nya.
 
 Parameter tambahan di Fase 2:
 - `intensity: Float` (0f-1f) — kekuatan distorsi shader, hanya berlaku di tier FULL.
 - `animate: Boolean` — matikan kalau mau hemat baterai / gelombang statis.
+- `respectBatterySaver: Boolean` (default true) — animasi otomatis berhenti saat device
+  dalam mode hemat baterai.
 
 ## GlassBlob (Fase 3)
 
 Varian dengan tepi organik yang bergerak, untuk elemen dekoratif:
 
 ```kotlin
-import com.liquidglass.core.blob.GlassBlob
+import com.ascentkit.core.blob.GlassBlob
 
 GlassBlob(
     modifier = Modifier.size(160.dp),
@@ -45,13 +47,19 @@ terus bergerak dan bisa mengganggu keterbacaan.
 ## Pakai di project lain
 
 ```kotlin
+// settings.gradle.kts
+include(":ascentkit-core")
+```
+
+```kotlin
+// app/build.gradle.kts
 dependencies {
-    implementation(project(":liquidglass-core"))
+    implementation(project(":ascentkit-core"))
 }
 ```
 
 ```kotlin
-import com.liquidglass.core.GlassSurface
+import com.ascentkit.core.GlassSurface
 
 GlassSurface(
     modifier = Modifier.size(280.dp, 140.dp),
@@ -65,23 +73,35 @@ GlassSurface(
 Atau langsung sebagai Modifier ke composable apa pun:
 
 ```kotlin
-import com.liquidglass.core.liquidGlass
+import com.ascentkit.core.liquidMorph
 
 Box(
     modifier = Modifier
         .size(200.dp, 100.dp)
-        .liquidGlass(blurRadius = 24f)
+        .liquidMorph(blurRadius = 24f)
 )
 ```
 
 ## Struktur
 
-- `liquidglass-core/` — library-nya (yang di-publish/dipakai project lain)
+- `ascentkit-core/` — library-nya (yang di-publish/dipakai project lain)
   - `GlassCapability.kt` — deteksi tier efek berdasarkan API level
-  - `GlassModifier.kt` — `Modifier.liquidGlass()`, inti blur+tint
+  - `GlassModifier.kt` — `Modifier.liquidMorph()`, inti blur+tint+shader
   - `GlassSurface.kt` — composable siap pakai
-  - `shader/LiquidGlassShader.kt` — source AGSL, disiapkan untuk Fase 2 (belum aktif dipakai)
+  - `LiquidMorphEffectFactory.kt` — perakit `RenderEffect`, cache `RuntimeShader` per surface
+  - `BatterySaver.kt` — deteksi mode hemat baterai device
+  - `shader/LiquidMorphShader.kt` — source AGSL untuk distorsi/refraction
+  - `blob/` — `BlobShape`, `BlobPhase`, `GlassBlob` (morphing shape organik)
 - `app/` — demo app
+
+## Optimasi performa
+
+- `RuntimeShader` di-cache per surface (di-`remember`), tidak dikompilasi ulang tiap frame.
+- Animasi (shader wave & blob wobble) otomatis berhenti saat device dalam mode hemat baterai.
+- `blurRadius <= 0` melewati seluruh `RenderEffect`/`graphicsLayer` offscreen — cocok untuk
+  mematikan efek tanpa mengganti composable, atau untuk daftar panjang berisi banyak surface.
+- Titik kontrol `BlobShape` disimpan sebagai `FloatArray` mentah, menghindari alokasi objek
+  `Offset` per titik pada jalur yang dipanggil tiap frame.
 
 ## Roadmap
 

@@ -1,4 +1,4 @@
-package com.liquidglass.core
+package com.ascentkit.core
 
 import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
@@ -6,7 +6,7 @@ import android.graphics.Shader
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.asComposeRenderEffect
-import com.liquidglass.core.shader.LiquidGlassShader
+import com.ascentkit.core.shader.LiquidMorphShader
 
 /**
  * Merakit RenderEffect final yang dipasang ke graphicsLayer, sesuai tier device.
@@ -24,7 +24,7 @@ import com.liquidglass.core.shader.LiquidGlassShader
  * BUKAN dibuat ulang tiap frame maupun dipakai sebagai singleton lintas-surface (ukuran
  * surface berbeda-beda perlu instance RuntimeShader terpisah).
  */
-internal class LiquidGlassEffectFactory {
+internal class LiquidMorphEffectFactory {
 
     // Lazy: shader baru dikompilasi saat pertama kali benar-benar dibutuhkan (tier FULL,
     // API 33+), bukan langsung saat factory dibuat. Device di tier lain tidak pernah
@@ -70,7 +70,7 @@ internal class LiquidGlassEffectFactory {
     ): androidx.compose.ui.graphics.RenderEffect {
         // Kompilasi hanya sekali per instance factory; frame berikutnya hanya update uniform,
         // yang jauh lebih murah (tidak ada parsing/compile ulang di GPU driver).
-        val shader = cachedShader ?: RuntimeShader(LiquidGlassShader.SOURCE).also {
+        val shader = cachedShader ?: RuntimeShader(LiquidMorphShader.SOURCE).also {
             cachedShader = it
         }
 

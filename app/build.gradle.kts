@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.liquidglass.demo"
+    namespace = "com.ascentkit.demo"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.liquidglass.demo"
+        applicationId = "com.ascentkit.demo"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -30,7 +30,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":liquidglass-core"))
+    implementation(project(":ascentkit-core"))
 
     implementation(platform("androidx.compose:compose-bom:2026.06.00"))
     implementation("androidx.compose.ui:ui")

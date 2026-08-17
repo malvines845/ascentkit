@@ -1,10 +1,10 @@
-package com.liquidglass.core.blob
+package com.ascentkit.core.blob
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.liquidglass.core.GlassSurface
+import com.ascentkit.core.GlassSurface
 
 /**
  * Varian [GlassSurface] dengan tepi organik yang "bernapas" (morphing blob),

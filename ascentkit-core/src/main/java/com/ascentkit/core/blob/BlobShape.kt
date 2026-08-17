@@ -1,4 +1,4 @@
-package com.liquidglass.core.blob
+package com.ascentkit.core.blob
 
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Outline

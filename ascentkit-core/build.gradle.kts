@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.liquidglass.core"
+    namespace = "com.ascentkit.core"
     compileSdk = 36
 
     defaultConfig {

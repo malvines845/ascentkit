@@ -1,4 +1,4 @@
-package com.liquidglass.demo
+package com.ascentkit.demo
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,9 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.liquidglass.core.GlassSurface
-import com.liquidglass.core.blob.GlassBlob
-import com.liquidglass.core.rememberGlassTier
+import com.ascentkit.core.GlassSurface
+import com.ascentkit.core.blob.GlassBlob
+import com.ascentkit.core.rememberGlassTier
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    LiquidGlassDemoScreen()
+                    LiquidMorphDemoScreen()
                 }
             }
         }
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LiquidGlassDemoScreen() {
+fun LiquidMorphDemoScreen() {
     val tier = rememberGlassTier()
 
     Box(
@@ -80,7 +80,7 @@ fun LiquidGlassDemoScreen() {
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = "Liquid Glass",
+                        text = "Liquid Morph",
                         color = Color.White,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,

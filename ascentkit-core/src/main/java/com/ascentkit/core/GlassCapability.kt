@@ -1,9 +1,9 @@
-package com.liquidglass.core
+package com.ascentkit.core
 
 import android.os.Build
 
 /**
- * Tier kemampuan efek liquid glass, ditentukan otomatis dari API level device.
+ * Tier kemampuan efek liquid morph, ditentukan otomatis dari API level device.
  *
  * FULL      (API 33+) -> blur real-time + AGSL refraction shader + morphing
  * BLUR_ONLY (API 31-32) -> blur real-time via RenderEffect, tanpa distorsi shader
