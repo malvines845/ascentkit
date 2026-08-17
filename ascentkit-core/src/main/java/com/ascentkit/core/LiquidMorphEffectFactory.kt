@@ -78,9 +78,16 @@ internal class LiquidMorphEffectFactory {
         shader.setFloatUniform("uTime", timeSeconds)
         shader.setFloatUniform("uTouch", touchX, touchY)
         shader.setFloatUniform("uIntensity", intensity)
-        shader.setInputShader("composable", blur)
 
-        val combined = RenderEffect.createRuntimeShaderEffect(shader, "composable")
+        // RuntimeShader.setInputShader() butuh objek android.graphics.Shader (mis. BitmapShader,
+        // gradient shader) — BUKAN android.graphics.RenderEffect, jadi blur (yang bertipe
+        // RenderEffect) tidak bisa langsung di-bind ke situ. Untuk merantai "blur lalu shader",
+        // caranya adalah membuat RenderEffect dari shader (dengan komponen "composable" di-bind
+        // otomatis oleh sistem ke konten RenderNode), lalu merangkainya dengan blur memakai
+        // RenderEffect.createChainedEffect(outer, inner): inner (blur) dijalankan lebih dulu,
+        // hasilnya menjadi input untuk outer (shader kita).
+        val shaderEffect = RenderEffect.createRuntimeShaderEffect(shader, "composable")
+        val combined = RenderEffect.createChainedEffect(shaderEffect, blur)
         return combined.asComposeRenderEffect()
     }
 }
