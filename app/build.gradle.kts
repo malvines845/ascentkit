@@ -1,6 +1,5 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
@@ -20,9 +19,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    // Tidak perlu blok kotlinOptions: dengan built-in Kotlin (AGP 9+), jvmTarget
+    // otomatis mengikuti compileOptions.targetCompatibility di atas.
 
     buildFeatures {
         compose = true
