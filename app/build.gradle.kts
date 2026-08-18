@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.ascentkit.demo"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.ascentkit.demo"

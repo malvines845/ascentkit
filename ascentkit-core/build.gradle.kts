@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.ascentkit.core"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         // API 26 = minimum absolut (RenderEffect butuh 31, AGSL butuh 33).
