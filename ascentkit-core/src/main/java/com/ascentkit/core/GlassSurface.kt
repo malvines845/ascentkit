@@ -2,6 +2,7 @@ package com.ascentkit.core
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,6 +19,13 @@ import androidx.compose.ui.graphics.Shape
  *     Text("Halo dari balik kaca", color = Color.White)
  * }
  * ```
+ *
+ * PENTING (arsitektur): blur/shader hanya dipasang pada layer background terpisah
+ * (`Modifier.matchParentSize().liquidMorph(...)`), BUKAN pada Box terluar yang juga
+ * menjadi induk dari [content]. `RenderEffect` mem-blur seluruh isi layer tempat ia
+ * dipasang — kalau dipasang di layer yang sama dengan teks/ikon, teks itu ikut ke-blur
+ * dan jadi tidak terbaca. Dengan struktur dua-layer ini, blur hanya mengenai background,
+ * sementara [content] digambar di layer terpisah di atasnya, tetap tajam.
  */
 @Composable
 fun GlassSurface(
@@ -31,16 +39,24 @@ fun GlassSurface(
     respectBatterySaver: Boolean = true,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
-    Box(
-        modifier = modifier.liquidMorph(
-            blurRadius = blurRadius,
-            tint = tint,
-            cornerRadius = cornerRadius,
-            shape = shape,
-            intensity = intensity,
-            animate = animate,
-            respectBatterySaver = respectBatterySaver,
-        ),
-        content = content,
-    )
+    Box(modifier = modifier) {
+        // Layer 1: background kaca. Blur/shader HANYA diterapkan di sini.
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .liquidMorph(
+                    blurRadius = blurRadius,
+                    tint = tint,
+                    cornerRadius = cornerRadius,
+                    shape = shape,
+                    intensity = intensity,
+                    animate = animate,
+                    respectBatterySaver = respectBatterySaver,
+                )
+        )
+
+        // Layer 2: konten (teks, ikon, dll). Digambar di layer terpisah tanpa
+        // RenderEffect apapun, sehingga tetap tajam meski background di baliknya blur.
+        content()
+    }
 }
