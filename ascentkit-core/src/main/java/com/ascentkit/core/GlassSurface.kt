@@ -1,6 +1,7 @@
 package com.ascentkit.core
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,7 +29,7 @@ fun GlassSurface(
     intensity: Float = 0.4f,
     animate: Boolean = true,
     respectBatterySaver: Boolean = true,
-    content: @Composable Box.() -> Unit = {},
+    content: @Composable BoxScope.() -> Unit = {},
 ) {
     Box(
         modifier = modifier.liquidMorph(
@@ -40,6 +41,6 @@ fun GlassSurface(
             animate = animate,
             respectBatterySaver = respectBatterySaver,
         ),
-        content = { content() },
+        content = content,
     )
 }

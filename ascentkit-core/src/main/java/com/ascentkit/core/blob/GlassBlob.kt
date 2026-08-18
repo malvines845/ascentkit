@@ -1,6 +1,6 @@
 package com.ascentkit.core.blob
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +39,7 @@ fun GlassBlob(
     controlPoints: Int = 24,
     animate: Boolean = true,
     respectBatterySaver: Boolean = true,
-    content: @Composable Box.() -> Unit = {},
+    content: @Composable BoxScope.() -> Unit = {},
 ) {
     val phase = rememberBlobPhase(
         speed = wobbleSpeed,
