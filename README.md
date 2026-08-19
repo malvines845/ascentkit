@@ -23,6 +23,83 @@ Parameter tambahan di Fase 2:
 - `respectBatterySaver: Boolean` (default true) — animasi otomatis berhenti saat device
   dalam mode hemat baterai.
 
+## GlassLens — varian eksperimental (tanpa blur, distorsi lensa)
+
+Berbeda secara fundamental dari `GlassSurface`: TIDAK memakai blur sama sekali. Sebagai
+gantinya, konten di belakang kaca disample dengan pembelokan (refraksi) yang menguat
+mendekati tepi, mensimulasikan kaca fisik yang membelokkan/membesarkan cahaya di
+sekitar tepinya — bukan mengaburkannya.
+
+```kotlin
+import com.ascentkit.core.lens.GlassLens
+
+GlassLens(
+    modifier = Modifier.size(280.dp, 140.dp),
+    cornerRadius = 28.dp,
+    borderWidth = 1.5.dp,     // lebar rim light di tepi
+    lensZoneWidth = 20.dp,    // lebar total zona distorsi (termasuk border)
+    refraction = 1.0f,        // kekuatan pembelokan/pembesaran
+) {
+    Text("Liquid Glass asli", color = Color.White)
+}
+```
+
+Tiga zona konsentris dari tepi ke tengah:
+1. **Border zone** (`borderWidth`) — rim light: garis highlight tipis mensimulasikan
+   pantulan cahaya di tepi kaca fisik.
+2. **Lens zone** (`lensZoneWidth - borderWidth`) — distorsi refraksi kuat, mengikuti
+   lengkungan `cornerRadius`, termasuk di sudut membulat.
+3. **Core zone** (sisa ruang di tengah) — kaca tenang nyaris tanpa distorsi, ruang aman
+   untuk teks/konten. `content` otomatis diberi padding sebesar `lensZoneWidth` agar
+   jatuh di zona ini.
+
+**Perbandingan dengan `GlassSurface`:**
+
+| | `GlassSurface` (Liquid Morph) | `GlassLens` |
+|---|---|---|
+| Blur | Ya, `RenderEffect.createBlurEffect` | Tidak ada sama sekali |
+| Efek utama | Blur + gelombang + ripple sentuh | Distorsi lensa di tepi + rim light |
+| Biaya render | Lebih ringan | Lebih berat (SDF rounded-box per piksel) |
+| Tier minimum untuk efek penuh | API 31 (blur polos), API 33 (+ shader) | API 33 (murni butuh RuntimeShader) |
+| Fallback di bawah tier minimum | Tint datar | Tint + border digambar statis |
+
+Keduanya sengaja dipertahankan terpisah (bukan salah satu menggantikan yang lain) supaya
+bisa dibandingkan langsung — lihat demo di `app/`.
+
+## GlassButton
+
+Tombol berbahan kaca dengan feedback tekan bawaan (scale + intensitas shader naik saat ditekan):
+
+```kotlin
+import com.ascentkit.core.GlassButton
+
+GlassButton(onClick = { /* aksi */ }) {
+    Text("Tekan aku", color = Color.White)
+}
+```
+
+Parameter khusus: `pressedScale` (default 0.96f), `pressedIntensityBoost` (default 0.2f),
+`enabled`. Tidak bergantung pada Material/Material3 — ripple memakai `LocalIndication`
+bawaan Compose Foundation, otomatis mengikuti tema ripple proyek konsumen jika ada.
+
+## GlassBottomSheet
+
+Modal bottom sheet berbahan kaca. Dikontrol dari luar (tidak mendukung drag/swipe —
+tap area scrim atau panggil `onDismissRequest` secara programatik):
+
+```kotlin
+import com.ascentkit.core.GlassBottomSheet
+
+var showSheet by remember { mutableStateOf(false) }
+
+GlassBottomSheet(
+    visible = showSheet,
+    onDismissRequest = { showSheet = false },
+) {
+    Text("Isi bottom sheet", color = Color.White)
+}
+```
+
 ## GlassBlob (Fase 3)
 
 Varian dengan tepi organik yang bergerak, untuk elemen dekoratif:
@@ -87,11 +164,15 @@ Box(
 - `ascentkit-core/` — library-nya (yang di-publish/dipakai project lain)
   - `GlassCapability.kt` — deteksi tier efek berdasarkan API level
   - `GlassModifier.kt` — `Modifier.liquidMorph()`, inti blur+tint+shader
-  - `GlassSurface.kt` — composable siap pakai
+  - `GlassSurface.kt` — composable siap pakai (struktur 2-layer: background blur terpisah dari konten)
+  - `GlassButton.kt` — tombol kaca dengan press animation
+  - `GlassBottomSheet.kt` — modal bottom sheet kaca (kontrol eksternal, tanpa drag)
   - `LiquidMorphEffectFactory.kt` — perakit `RenderEffect`, cache `RuntimeShader` per surface
   - `BatterySaver.kt` — deteksi mode hemat baterai device
-  - `shader/LiquidMorphShader.kt` — source AGSL untuk distorsi/refraction
+  - `shader/LiquidMorphShader.kt` — source AGSL untuk distorsi/refraction (blur-based)
   - `blob/` — `BlobShape`, `BlobPhase`, `GlassBlob` (morphing shape organik)
+  - `lens/` — `GlassLens`, `GlassLensShader`, `GlassLensEffectFactory` (varian tanpa blur,
+    distorsi lensa + rim light, lihat bagian GlassLens di atas)
 - `app/` — demo app
 
 ## Optimasi performa
