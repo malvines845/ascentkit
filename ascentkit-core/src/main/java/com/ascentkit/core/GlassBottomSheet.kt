@@ -128,7 +128,7 @@ fun GlassBottomSheet(
                         intensity = intensity,
                         animate = animate,
                         respectBatterySaver = respectBatterySaver,
-                    ) {
+                    ) glassSurfaceContent@{
                         Column(modifier = Modifier.fillMaxWidth()) {
                             if (showHandle) {
                                 Box(
@@ -141,7 +141,13 @@ fun GlassBottomSheet(
                                         .background(Color.White.copy(alpha = 0.4f)),
                                 )
                             }
-                            content()
+                            // content butuh receiver BoxScope (deklarasinya
+                            // `@Composable BoxScope.() -> Unit`), tapi kita sekarang berada
+                            // di dalam Column (ColumnScope), bukan langsung di BoxScope milik
+                            // GlassSurface. Label @glassSurfaceContent di atas memberi akses
+                            // eksplisit ke receiver BoxScope terluar, menyelesaikan ambiguitas
+                            // yang menyebabkan "cannot be called with implicit receiver".
+                            this@glassSurfaceContent.content()
                         }
                     }
                 }

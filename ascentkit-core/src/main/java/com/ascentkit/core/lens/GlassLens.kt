@@ -47,7 +47,7 @@ fun GlassLens(
     borderStrength: Float = 0.8f,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier) glassLensRoot@{
         // Layer 1: efek lensa. Sama seperti GlassSurface, dipasang di layer terpisah
         // (matchParentSize) supaya konten di layer 2 TIDAK ikut terdistorsi/terpotong.
         Box(
@@ -65,12 +65,18 @@ fun GlassLens(
 
         // Layer 2: konten, diberi padding sebesar zona lensa supaya jatuh di zona core
         // yang tenang (lihat catatan ruang konten di dokumentasi kelas).
+        //
+        // content butuh receiver BoxScope milik Box TERLUAR (diberi label @glassLensRoot
+        // di atas) — bukan BoxScope milik Box bertingkat di bawah ini yang dibuat hanya
+        // untuk menerapkan padding. Tanpa qualified this eksplisit, compiler akan mencoba
+        // me-resolve content() terhadap BoxScope Box dalam yang salah, menyebabkan
+        // "cannot be called with implicit receiver".
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .padding(lensZoneWidth),
         ) {
-            content()
+            this@glassLensRoot.content()
         }
     }
 }
