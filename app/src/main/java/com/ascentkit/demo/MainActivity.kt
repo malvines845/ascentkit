@@ -216,10 +216,10 @@ fun LiquidMorphDemoScreen() {
                     .width(280.dp)
                     .height(140.dp),
                 cornerRadius = 28.dp,
-                borderWidth = 1.5.dp,
-                lensZoneWidth = 20.dp,
-                refraction = 1.0f,
-                borderStrength = 0.9f,
+                borderWidth = 2.dp,
+                lensZoneWidth = 36.dp,
+                refraction = 0.55f,
+                borderStrength = 1f,
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),

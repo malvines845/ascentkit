@@ -26,7 +26,11 @@ package com.ascentkit.core.lens
  *   - uLensWidth      (float)  -> lebar TOTAL dari tepi sampai akhir zona lensa (termasuk
  *                                 border di dalamnya), dalam px. Jadi lebar zona lensa murni
  *                                 adalah (uLensWidth - uBorderWidth).
- *   - uRefraction     (float)  -> kekuatan pembesaran/pembelokan di zona lensa (mis. 0.3 - 1.2)
+ *   - uRefraction     (float)  -> kekuatan pembesaran/pembelokan di zona lensa. Skala
+ *                                 proporsional terhadap uLensWidth (lihat catatan di
+ *                                 dalam shader), rentang wajar mis. 0.15 - 0.6. Nilai
+ *                                 di atas ~0.8 mulai terlihat pecah/artifact karena
+ *                                 sample coordinate bisa jatuh jauh di luar konten asli.
  *   - uBorderStrength (float)  -> opasitas rim light di border (0.0 - 1.0)
  */
 object GlassLensShader {
@@ -79,7 +83,13 @@ object GlassLensShader {
             // Offset sample: menarik konten dari arah dalam ke arah tepi (magnifikasi),
             // mengikuti arah normal SDF sehingga lengkungannya mengikuti kontur border,
             // termasuk di sudut-sudut membulat.
-            float2 sampleOffset = inwardDir * lensStrength * uBorderWidth * 1.8;
+            //
+            // PENTING: skala offset diikat ke uLensWidth (lebar zona distorsi), BUKAN
+            // uBorderWidth (lebar rim light) — keduanya parameter dengan tujuan berbeda.
+            // Border biasanya sangat tipis (mis. 1.5dp) untuk rim light yang realistis;
+            // mengikat skala distorsi ke situ membuat efek lensa nyaris tak terlihat
+            // berapa pun uRefraction dinaikkan, karena hasil kali selalu kecil.
+            float2 sampleOffset = inwardDir * lensStrength * uLensWidth * 0.9;
             float2 sampleCoord = coord - sampleOffset;
 
             half4 baseColor = composable.eval(sampleCoord);

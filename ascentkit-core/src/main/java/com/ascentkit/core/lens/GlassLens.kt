@@ -43,7 +43,7 @@ fun GlassLens(
     cornerRadius: Dp = 24.dp,
     borderWidth: Dp = 1.5.dp,
     lensZoneWidth: Dp = 18.dp,
-    refraction: Float = 0.9f,
+    refraction: Float = 0.35f,
     borderStrength: Float = 0.8f,
     content: @Composable BoxScope.() -> Unit = {},
 ) {

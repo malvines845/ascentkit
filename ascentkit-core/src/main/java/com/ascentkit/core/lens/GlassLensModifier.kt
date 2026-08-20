@@ -48,7 +48,9 @@ import com.ascentkit.core.GlassTier
  *                        border di dalamnya), dalam dp. HARUS lebih besar dari [borderWidth]
  *                        — selisihnya adalah lebar murni zona distorsi lensa. Core zone
  *                        mengisi sisa ruang di tengah, di luar [lensZoneWidth].
- * @param refraction      kekuatan pembelokan/pembesaran di zona lensa (0f - ~1.5f wajar).
+ * @param refraction      kekuatan pembelokan/pembesaran di zona lensa. Skala proporsional
+ *                        terhadap [lensZoneWidth]; rentang wajar 0.15f - 0.6f. Nilai di
+ *                        atas ~0.8f mulai terlihat pecah/artifact.
  * @param borderStrength  opasitas rim light (0f - 1f).
  */
 fun Modifier.glassLens(
@@ -56,7 +58,7 @@ fun Modifier.glassLens(
     cornerRadius: Dp = 24.dp,
     borderWidth: Dp = 1.5.dp,
     lensZoneWidth: Dp = 18.dp,
-    refraction: Float = 0.9f,
+    refraction: Float = 0.35f,
     borderStrength: Float = 0.8f,
 ): Modifier = composed {
     val shape = RoundedCornerShape(cornerRadius)
