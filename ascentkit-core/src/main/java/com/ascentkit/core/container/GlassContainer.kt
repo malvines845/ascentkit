@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -83,6 +84,11 @@ fun GlassContainer(
     }
     var containerSizePx by remember { mutableStateOf(Offset.Zero) }
 
+    // Registry posisi tiap glass child (lihat dokumentasi lengkap di
+    // GlassPositionRegistry.kt). Dibuat sekali per instance GlassContainer lewat
+    // remember, sehingga identitasnya stabil antar-recomposition.
+    val positionRegistry = remember { mutableStateMapOf<Any, Offset>() }
+
     if (!inPreview) {
         // Loop capture: menunggu tepat `framesPerCapture` frame Choreographer (bukan
         // delay() yang lepas dari render clock), lalu capture SATU KALI. Loop otomatis
@@ -102,7 +108,10 @@ fun GlassContainer(
         }
     }
 
-    CompositionLocalProvider(LocalGlassContainerSnapshot provides snapshot) {
+    CompositionLocalProvider(
+        LocalGlassContainerSnapshot provides snapshot,
+        LocalGlassPositionRegistry provides positionRegistry,
+    ) {
         Box(
             modifier = modifier
                 .onSizeChanged { containerSizePx = Offset(it.width.toFloat(), it.height.toFloat()) },
@@ -122,6 +131,12 @@ fun GlassContainer(
             // ke backgroundLayer manapun. Glass children di sini mengambil snapshot
             // background lewat LocalGlassContainerSnapshot, bukan dengan mensampling
             // lapisan tempat mereka sendiri berada.
+            //
+            // PENTING: content() dipanggil di sini TANPA Box/Column pembungkus tambahan
+            // di antara Box terluar ini dan glass children di dalamnya — ini WAJIB agar
+            // Modifier.onPlaced milik tiap glass child (lihat trackPositionInContainer)
+            // menghasilkan posisi yang benar-benar relatif terhadap GlassContainer ini,
+            // bukan terhadap pembungkus lain yang tidak seharusnya ada.
             content()
         }
     }
