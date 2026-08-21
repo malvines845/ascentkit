@@ -33,6 +33,90 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # === DIAGNOSTIC STEP (sementara) ===
+      # Tujuan: memverifikasi versi PERSIS androidx.compose.ui:ui yang benar-benar
+      # di-resolve oleh Gradle untuk konfigurasi debugCompileClasspath milik
+      # :ascentkit-core, lalu memeriksa isi sebenarnya dari LayoutCoordinates.class
+      # pada artifact tersebut (bukan dokumentasi/mirror pihak ketiga).
+      # Step ini TIDAK mengubah source code apa pun (PositionTracking.kt,
+      # GlassContainer.kt, GlassPositionRegistry.kt, shader, atau file GlassLens
+      # lainnya tetap seperti semula) dan TIDAK mengubah urutan build step yang sudah ada.
+      - name: Diagnostic - dependency insight for compose-ui
+        run: |
+          ./gradlew :ascentkit-core:dependencyInsight \
+            --dependency androidx.compose.ui:ui \
+            --configuration debugCompileClasspath \
+            | tee dependency-insight-output.txt || {
+              echo "=== dependencyInsight dengan configuration 'debugCompileClasspath' gagal, mencoba fallback ==="
+              echo "=== Daftar semua configuration yang tersedia di :ascentkit-core ==="
+              ./gradlew :ascentkit-core:dependencies --configuration debugCompileClasspath || \
+                ./gradlew :ascentkit-core:dependencies | tee dependency-insight-output.txt
+            }
+
+      - name: Diagnostic - locate resolved compose-ui artifact and inspect LayoutCoordinates
+        run: |
+          set -e
+          echo "=== Mencari artifact androidx.compose.ui:ui-android di Gradle cache ==="
+          # Artifact Android Compose UI dipublikasikan sebagai ui-android (.aar),
+          # bukan ui (.jar) murni -- ui itu sendiri biasanya metadata/POM only untuk
+          # target Android. Cari keduanya untuk berjaga-jaga.
+          FOUND_FILES=$(find ~/.gradle/caches -type f \( -iname "ui-android-*.aar" -o -iname "ui-*.jar" \) 2>/dev/null | grep -i "compose.ui" || true)
+          echo "File yang ditemukan:"
+          echo "$FOUND_FILES"
+
+          mkdir -p /tmp/compose-ui-inspect
+          FOUND_AAR=$(echo "$FOUND_FILES" | grep -i "\.aar$" | head -n 1 || true)
+          FOUND_JAR=$(echo "$FOUND_FILES" | grep -i "\.jar$" | head -n 1 || true)
+
+          if [ -n "$FOUND_AAR" ]; then
+            echo "=== Menggunakan .aar: $FOUND_AAR ==="
+            cp "$FOUND_AAR" /tmp/compose-ui-inspect/ui.aar
+            cd /tmp/compose-ui-inspect
+            unzip -o ui.aar -d aar-extracted > /dev/null
+            echo "Isi aar-extracted:"
+            ls -la aar-extracted
+            if [ -f "aar-extracted/classes.jar" ]; then
+              mkdir -p classes-extracted
+              cd classes-extracted
+              unzip -o ../aar-extracted/classes.jar -d . > /dev/null
+              cd ..
+              CLASS_FILE=$(find classes-extracted -path "*androidx/compose/ui/layout/LayoutCoordinates.class")
+              echo "=== Class file ditemukan: $CLASS_FILE ==="
+              if [ -n "$CLASS_FILE" ]; then
+                echo "=== javap output untuk LayoutCoordinates ==="
+                javap -p "$CLASS_FILE"
+              else
+                echo "LayoutCoordinates.class TIDAK ditemukan di dalam classes.jar"
+                echo "Mencari kemungkinan nama file lain terkait LayoutCoordinates:"
+                find classes-extracted -iname "*LayoutCoordinates*"
+              fi
+            else
+              echo "classes.jar tidak ditemukan di dalam .aar"
+            fi
+          elif [ -n "$FOUND_JAR" ]; then
+            echo "=== Menggunakan .jar: $FOUND_JAR ==="
+            cp "$FOUND_JAR" /tmp/compose-ui-inspect/ui.jar
+            cd /tmp/compose-ui-inspect
+            mkdir -p jar-extracted
+            cd jar-extracted
+            unzip -o ../ui.jar -d . > /dev/null
+            cd ..
+            CLASS_FILE=$(find jar-extracted -path "*androidx/compose/ui/layout/LayoutCoordinates.class")
+            echo "=== Class file ditemukan: $CLASS_FILE ==="
+            if [ -n "$CLASS_FILE" ]; then
+              echo "=== javap output untuk LayoutCoordinates ==="
+              javap -p "$CLASS_FILE"
+            else
+              echo "LayoutCoordinates.class TIDAK ditemukan di dalam jar"
+              find jar-extracted -iname "*LayoutCoordinates*"
+            fi
+          else
+            echo "TIDAK ADA artifact compose.ui (.aar atau .jar) ditemukan di Gradle cache."
+            echo "Menampilkan seluruh isi cache modules-2 untuk androidx.compose.ui sebagai fallback diagnosa:"
+            find ~/.gradle/caches -type d -iname "*compose.ui*" 2>/dev/null
+          fi
+      # === AKHIR DIAGNOSTIC STEP ===
+
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
